@@ -1,0 +1,1 @@
+let messageFace = ['VALID', 'INVALID', 'HAND', ' MASK', 'SUNGLASSES', 'COVER']
