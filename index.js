@@ -20,10 +20,9 @@
 // import * as tfjsWasm from '@tensorflow/tfjs-backend-wasm';
 // import '@tensorflow/tfjs-backend-webgl';
 // import '@tensorflow/tfjs-backend-cpu';
-
-tfjsWasm.setWasmPaths(
-  `https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@${tfjsWasm.version_wasm}/dist/`);
-
+// tfjsWasm.setWasmPaths(
+//   `https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@${tfjsWasm.version_wasm}/dist/`);
+tf.setBackend('wasm').then(() => setupPage());
 const stats = new Stats();
 stats.showPanel(0);
 document.body.prepend(stats.domElement);
@@ -242,4 +241,4 @@ const setupPage = async () => {
   }, 500)
 };
 
-setupPage();
+// setupPage();
