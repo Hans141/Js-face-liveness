@@ -15,8 +15,8 @@
  * =============================================================================
  */
 
-import * as blazeface from '@tensorflow-models/blazeface';
-import * as tf from "@tensorflow/tfjs"
+// import * as blazeface from '@tensorflow-models/blazeface';
+// import * as tf from "@tensorflow/tfjs"
 import * as tfjsWasm from '@tensorflow/tfjs-backend-wasm';
 import '@tensorflow/tfjs-backend-webgl';
 import '@tensorflow/tfjs-backend-cpu';
