@@ -26,7 +26,7 @@ tf.setBackend('wasm').then(() => setupPage());
 const stats = new Stats();
 stats.showPanel(0);
 document.body.prepend(stats.domElement);
-const modelURL = 'model/model.json';
+const modelURL = 'model3/model.json';
 let modelFace;
 let model;
 let ctx;
@@ -40,6 +40,7 @@ let stop_button = document.querySelector("#stop-record");
 let download_link = document.querySelector("#download-video");
 let message = document.querySelector('#message')
 let faceMessage = document.querySelector('#faceMessage')
+let timeMessage = document.querySelector('#timeMessage')
 let camera_stream = null;
 let media_recorder = null
 let blobs_recorded = [];
@@ -70,7 +71,7 @@ start_button.addEventListener('click', function () {
   // event : recording stopped & all blobs sent
   media_recorder.addEventListener('stop', function () {
     // create local object URL from the recorded video blobs
-    let video_local = URL.createObjectURL(new Blob(blobs_recorded, { type: 'video/webm' }));
+    let video_local = URL.createObjectURL(new Blob(blobs_recorded, { type: 'video/mp4' }));
     download_link.href = video_local;
   });
 
@@ -125,8 +126,10 @@ const renderPrediction = async () => {
     ctx_face.canvas.width = cropWidth * 1.6
     ctx_face.canvas.height = cropHeight * 1.6
     ctx_face.drawImage(video,
-      640 - bottomRight[0] - cropWidth - cropWidth * 0.3, topLeft[1] - cropHeight * 0.5, cropWidth * 1.6, cropHeight * 1.8,
-      0, 0, cropWidth * 1.6, cropHeight * 1.8)
+      640 - bottomRight[0] - cropWidth - cropWidth * 0.3,
+      topLeft[1] - cropHeight * 0.5,
+      cropWidth * 1.6, cropHeight * 1.8,
+      0, 0, 256, 256)
     let pixel = ctx_face.getImageData(0, 0, 256, 256);
     dataPixel = pixel.data
     let left_distance = distance_2_point(left_ear, nose)
@@ -176,7 +179,11 @@ const renderPrediction = async () => {
 const getLabelFace = async (data) => {
   let result = arrayToRgbArray(data)
   processedImage = await tf.tensor3d(result)
+  const before = Date.now();
   const prediction = await modelFace.predict(tf.reshape(processedImage, shape = [-1, 256, 256, 3]));
+  const after = Date.now();
+  console.log(`${after - before}ms`);
+  timeMessage.innerHTML = `Model processing time ${after - before}ms`
   const label = prediction.argMax(axis = 1).dataSync()[0];
   return label
 }
@@ -186,11 +193,12 @@ let arrayToRgbArray = (data) => {
     input.push([])
     for (let j = 0; j < 256; j++) {
       input[i].push([])
-      input[i][j].push(data[(i * 256 + j) * 4 + 2])
-      input[i][j].push(data[(i * 256 + j) * 4 + 1])
       input[i][j].push(data[(i * 256 + j) * 4])
+      input[i][j].push(data[(i * 256 + j) * 4 + 1])
+      input[i][j].push(data[(i * 256 + j) * 4 + 2])
     }
   }
+  // console.log('input', input)
   return input
 }
 const distance_2_point = (point_1, point_2) => {
@@ -236,9 +244,8 @@ const setupPage = async () => {
   renderPrediction();
   setInterval(async () => {
     let label = await getLabelFace(dataPixel)
-    console.log('label', label)
     faceMessage.innerHTML = `Label: ${label} ${messageFace[label]} `
-  }, 500)
+  }, 300)
 };
 
 // setupPage();
