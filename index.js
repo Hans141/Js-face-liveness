@@ -25,7 +25,7 @@ tf.setBackend('wasm').then(() => setupPage());
 const stats = new Stats();
 stats.showPanel(0);
 document.body.prepend(stats.domElement);
-const modelURL = 'model3/model.json';
+const modelURL = 'modelFace/model.json';
 let modelFace;
 let model;
 let ctx;
@@ -112,10 +112,9 @@ const renderPrediction = async () => {
     message.innerHTML = `Message: No face`
   }
   else {
-    const right_eye = predictions[0].landmarks[0];
-    const left_eye = predictions[0].landmarks[1];
     const nose = predictions[0].landmarks[2];
-    const mouth = predictions[0].landmarks[3];
+    let center = [320, 240]
+    let distanceNoseToCenter = distance_2_point(nose, center)
     const right_ear = predictions[0].landmarks[4];
     const left_ear = predictions[0].landmarks[5];
     let bottomRight = predictions[0].bottomRight;
@@ -134,17 +133,23 @@ const renderPrediction = async () => {
     let left_distance = distance_2_point(left_ear, nose)
     let right_distance = distance_2_point(right_ear, nose)
     let ratio = left_distance / right_distance
-    if (ratio > 2.2) {
-      message.innerHTML = `Message: Turn your face left`
-    }
-    else if (ratio < 0.45) {
-      message.innerHTML = `Message: Turn your face right`
+    if (distanceNoseToCenter < 100) {
+      if (ratio > 2.2) {
+        message.innerHTML = `Message: Turn your face left`
+      }
+      else if (ratio < 0.45) {
+        message.innerHTML = `Message: Turn your face right`
+      }
+      else {
+        message.innerHTML = `Message: Keep your face still`
+      }
     }
     else {
-      message.innerHTML = `Message: Keep your face still`
+      message.innerHTML = `Message: Please fill your face in shape`
     }
+
   }
-  if (predictions.length > 0) {
+  if (predictions.length > 0 || distanceNoseToCenter < 100) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < predictions.length; i++) {
       if (returnTensors) {
@@ -181,7 +186,6 @@ const getLabelFace = async (data) => {
   const before = Date.now();
   const prediction = await modelFace.predict(tf.reshape(processedImage, shape = [-1, 256, 256, 3]));
   const after = Date.now();
-  console.log(`${after - before}ms`);
   timeMessage.innerHTML = `Model processing time ${after - before}ms`
   const label = prediction.argMax(axis = 1).dataSync()[0];
   return label
