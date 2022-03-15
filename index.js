@@ -45,6 +45,7 @@ let media_recorder = null
 let blobs_recorded = [];
 let base64_recorded = []
 let dataPixel
+let distanceNoseToCenter;
 let layer = document.getElementById('layer')
 ctx_layer = layer.getContext('2d')
 let face = document.getElementById('face')
@@ -114,7 +115,7 @@ const renderPrediction = async () => {
   else {
     const nose = predictions[0].landmarks[2];
     let center = [320, 240]
-    let distanceNoseToCenter = distance_2_point(nose, center)
+    distanceNoseToCenter = distance_2_point(nose, center)
     const right_ear = predictions[0].landmarks[4];
     const left_ear = predictions[0].landmarks[5];
     let bottomRight = predictions[0].bottomRight;
@@ -133,7 +134,7 @@ const renderPrediction = async () => {
     let left_distance = distance_2_point(left_ear, nose)
     let right_distance = distance_2_point(right_ear, nose)
     let ratio = left_distance / right_distance
-    if (distanceNoseToCenter < 100) {
+    if (distanceNoseToCenter && distanceNoseToCenter < 100) {
       if (ratio > 2.2) {
         message.innerHTML = `Message: Turn your face left`
       }
@@ -149,7 +150,7 @@ const renderPrediction = async () => {
     }
 
   }
-  if (predictions.length > 0 || distanceNoseToCenter < 100) {
+  if (predictions.length > 0 || (distanceNoseToCenter && distanceNoseToCenter < 100)) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < predictions.length; i++) {
       if (returnTensors) {
@@ -214,7 +215,6 @@ const distance_2_point = (point_1, point_2) => {
 }
 const initModelFace = async () => {
   if (!modelFace) modelFace = await tf.loadGraphModel(modelURL);
-  console.log('modelFace', modelFace);
 }
 const setupPage = async () => {
   message.innerHTML = `Message: Setting up camera`
