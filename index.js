@@ -122,13 +122,20 @@ const renderPrediction = async () => {
     let topLeft = predictions[0].topLeft;
     let cropWidth = topLeft[0] - bottomRight[0]
     let cropHeight = bottomRight[1] - topLeft[1]
+    if(cropWidth>cropHeight)
+    {
+      cropHeight = cropWidth
+    }
+    else{
+      cropWidth = cropHeight
+    }
     ctx_face.canvas.width = 640
     ctx_face.canvas.height = 480
-    ctx_face.drawImage(video,
-      640 - bottomRight[0] - cropWidth - cropWidth * 0.3,
-      topLeft[1] - cropHeight * 0.5,
-      cropWidth * 1.6, cropHeight * 1.8,
-      0, 0, 256, 256)
+    let sx = 640 - bottomRight[0] - cropWidth - cropWidth * 0.3
+    let sy = topLeft[1] - cropHeight * 0.5
+    let sWidth = cropWidth*1.6
+    let sHeight = cropHeight*1.6
+    ctx_face.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, 256, 256)
     let pixel = ctx_face.getImageData(0, 0, 256, 256);
     dataPixel = pixel.data
     let left_distance = distance_2_point(left_ear, nose)
