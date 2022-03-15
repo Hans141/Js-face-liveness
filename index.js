@@ -122,8 +122,8 @@ const renderPrediction = async () => {
     let topLeft = predictions[0].topLeft;
     let cropWidth = topLeft[0] - bottomRight[0]
     let cropHeight = bottomRight[1] - topLeft[1]
-    ctx_face.canvas.width = cropWidth * 1.6
-    ctx_face.canvas.height = cropHeight * 1.6
+    ctx_face.canvas.width = 640
+    ctx_face.canvas.height = 480
     ctx_face.drawImage(video,
       640 - bottomRight[0] - cropWidth - cropWidth * 0.3,
       topLeft[1] - cropHeight * 0.5,
