@@ -25,7 +25,7 @@ tf.setBackend('wasm').then(() => setupPage());
 const stats = new Stats();
 stats.showPanel(0);
 document.body.prepend(stats.domElement);
-const modelURL = 'modelFace/model.json';
+const modelURL = 'model3/model.json';
 let modelFace;
 let model;
 let ctx;

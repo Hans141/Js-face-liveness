@@ -1,1 +1,1 @@
-let messageFace = ['VALID', 'HAND', ' MASK', 'SUNGLASSES', 'COVER']
+let messageFace = ['VALID', 'HAND', 'MASK', 'SUNGLASSES', 'COVER']
